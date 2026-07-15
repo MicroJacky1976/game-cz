@@ -249,6 +249,23 @@ def draw_content_panel():
     elif panel_mode == "exercise":
         _draw_exercise_content(px, py, pw, ph)
 
+def _get_font(size):
+    """获取字体对象，优先使用项目字体，回退到系统字体"""
+    import os
+    font_path = os.path.join("fonts", FONT_NAME)
+    try:
+        return pygame.font.Font(font_path, size)
+    except (FileNotFoundError, pygame.error):
+        try:
+            return pygame.font.SysFont(FONT_NAME.replace(".ttc", ""), size)
+        except pygame.error:
+            return pygame.font.Font(None, size)
+
+def _render_text_line(font, text, x, y, color):
+    """使用 pygame 字体渲染单行文字"""
+    surf = font.render(text, True, color)
+    screen.surface.blit(surf, (x, y))
+
 def _draw_intro_content(px, py, pw, ph):
     """绘制古卷轴风格的简介内容"""
     # 内容区域——羊皮纸风格
@@ -273,12 +290,33 @@ def _draw_intro_content(px, py, pw, ph):
                      fontname=FONT_NAME,
                      fontsize=13, color=(180, 160, 100))
 
-    # 简介文字（暖色）
-    screen.draw.text(panel_poi["intro"],
-                     topleft=(px + 30, py + 78),
-                     fontname=FONT_NAME,
-                     fontsize=16, color=(230, 215, 180),
-                     width=pw - 60)
+    # ── 手动换行绘制简介文字 ──
+    max_width = pw - 60
+    line_height = 22
+    text_x = px + 30
+    text_y = py + 78
+
+    font = _get_font(16)
+    text_color = (230, 215, 180)
+
+    for paragraph in panel_poi["intro"].split("\n"):
+        if not paragraph:
+            text_y += line_height
+            continue
+        # 手动折行：逐字累加，超出宽度则换行
+        line = ""
+        for ch in paragraph:
+            test_line = line + ch
+            if font.size(test_line)[0] > max_width:
+                # 渲染当前行（不包含 ch）
+                _render_text_line(font, line, text_x, text_y, text_color)
+                text_y += line_height
+                line = ch
+            else:
+                line = test_line
+        if line:
+            _render_text_line(font, line, text_x, text_y, text_color)
+            text_y += line_height
 
 def _draw_exercise_content(px, py, pw, ph):
     """绘制习题内容"""
