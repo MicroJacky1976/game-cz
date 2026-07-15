@@ -238,11 +238,10 @@ def draw_content_panel():
                      fontname=FONT_NAME,
                      fontsize=20, color=COLOR_TITLE)
 
-    # 关闭按钮（游戏风格 X）
-    close_rect = Rect(px + pw - 38, py + 10, 28, 28)
+    # 关闭按钮（醒目的 X）
+    close_rect = Rect(px + pw - 40, py + 8, 30, 30)
     panel_close_rect = close_rect
-    draw_rounded_rect(screen.surface, close_rect, COLOR_CLOSE_BTN, radius=4)
-    screen.draw.text("✕", center=close_rect.center, fontname=FONT_NAME, fontsize=16, color=(255, 255, 255))
+    screen.draw.text("✕", center=close_rect.center, fontname=FONT_NAME, fontsize=22, color=COLOR_CLOSE_BTN)
 
     if panel_mode == "intro":
         _draw_intro_content(px, py, pw, ph)
