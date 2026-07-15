@@ -266,19 +266,46 @@ def _render_text_line(font, text, x, y, color):
     surf = font.render(text, True, color)
     screen.surface.blit(surf, (x, y))
 
+def _load_poi_image(poi):
+    """加载 POI 的配图（根据 poi["image"] 字段），缓存结果"""
+    if not hasattr(_load_poi_image, "cache"):
+        _load_poi_image.cache = {}
+    img_name = poi.get("image")
+    if not img_name:
+        return None
+    if img_name in _load_poi_image.cache:
+        return _load_poi_image.cache[img_name]
+    img_path = os.path.join("images", img_name)
+    try:
+        img = pygame.image.load(img_path).convert()
+        _load_poi_image.cache[img_name] = img
+        return img
+    except (FileNotFoundError, pygame.error):
+        _load_poi_image.cache[img_name] = None
+        return None
+
 def _draw_intro_content(px, py, pw, ph):
     """绘制古卷轴风格的简介内容"""
+    # 计算配图尺寸（如有），在内容区域底部预留空间
+    poi_img = _load_poi_image(panel_poi)
+    img_display_w, img_display_h = 0, 0
+    padding_bottom = 8
+    if poi_img:
+        img_w, img_h = poi_img.get_size()
+        max_img_w = pw - 60
+        max_img_h = 140
+        scale = min(max_img_w / img_w, max_img_h / img_h, 1.0)
+        img_display_w = int(img_w * scale)
+        img_display_h = int(img_h * scale)
+
     # 内容区域——羊皮纸风格
     content_rect = Rect(px + 16, py + 50, pw - 32, ph - 70)
     scroll_surf = pygame.Surface((content_rect.w, content_rect.h), pygame.SRCALPHA)
-    # 羊皮纸底色
     pygame.draw.rect(scroll_surf, (60, 52, 40, 230), (0, 0, content_rect.w, content_rect.h),
                      border_radius=4)
-    # 卷轴上下装饰边
     for yy in (4, content_rect.h - 5):
         pygame.draw.rect(scroll_surf, (120, 100, 60, 100),
                          (10, yy, content_rect.w - 20, 2))
-    # 左右装饰线
     for xx in (6, content_rect.w - 7):
         pygame.draw.line(scroll_surf, (120, 100, 60, 60),
                          (xx, 6), (xx, content_rect.h - 6))
@@ -290,33 +317,46 @@ def _draw_intro_content(px, py, pw, ph):
                      fontname=FONT_NAME,
                      fontsize=13, color=(180, 160, 100))
 
-    # ── 手动换行绘制简介文字 ──
+    # ── 手动换行绘制简介文字（预留图片空间） ──
     max_width = pw - 60
     line_height = 22
     text_x = px + 30
     text_y = py + 78
+    # 文字可用底部边界（预留图片空间）
+    text_bottom = py + 50 + (ph - 70) - padding_bottom
+    if img_display_h > 0:
+        text_bottom -= img_display_h + 6
 
     font = _get_font(16)
     text_color = (230, 215, 180)
 
     for paragraph in panel_poi["intro"].split("\n"):
+        if text_y + line_height > text_bottom:
+            break
         if not paragraph:
             text_y += line_height
             continue
-        # 手动折行：逐字累加，超出宽度则换行
         line = ""
         for ch in paragraph:
             test_line = line + ch
             if font.size(test_line)[0] > max_width:
-                # 渲染当前行（不包含 ch）
+                if text_y + line_height > text_bottom:
+                    break
                 _render_text_line(font, line, text_x, text_y, text_color)
                 text_y += line_height
                 line = ch
             else:
                 line = test_line
-        if line:
+        if line and text_y + line_height <= text_bottom:
             _render_text_line(font, line, text_x, text_y, text_color)
             text_y += line_height
+
+    # ── 显示 POI 配图 ──
+    if poi_img and img_display_h > 0:
+        scaled = pygame.transform.smoothscale(poi_img, (img_display_w, img_display_h))
+        img_x = px + (pw - img_display_w) // 2
+        img_y = py + 50 + (ph - 70) - img_display_h - padding_bottom
+        screen.surface.blit(scaled, (img_x, img_y))
 
 def _draw_exercise_content(px, py, pw, ph):
     """绘制习题内容"""
