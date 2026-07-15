@@ -238,10 +238,16 @@ def draw_content_panel():
                      fontname=FONT_NAME,
                      fontsize=20, color=COLOR_TITLE)
 
-    # 关闭按钮（醒目的 X）
+    # 关闭按钮（用线条绘制方正的 X）
     close_rect = Rect(px + pw - 40, py + 8, 30, 30)
     panel_close_rect = close_rect
-    screen.draw.text("X", center=close_rect.center, fontname=FONT_NAME, fontsize=22, color=COLOR_CLOSE_BTN)
+    pad = 6
+    pygame.draw.line(screen.surface, COLOR_CLOSE_BTN,
+                     (close_rect.left + pad, close_rect.top + pad),
+                     (close_rect.right - pad, close_rect.bottom - pad), 3)
+    pygame.draw.line(screen.surface, COLOR_CLOSE_BTN,
+                     (close_rect.right - pad, close_rect.top + pad),
+                     (close_rect.left + pad, close_rect.bottom - pad), 3)
 
     if panel_mode == "intro":
         _draw_intro_content(px, py, pw, ph)
