@@ -331,19 +331,22 @@ def _draw_intro_content(px, py, pw, ph):
             _render_text_line(font, line, text_x, text_y, text_color)
             text_y += line_height
 
-    # ── 在简介文字后显示配图 ──
+    # ── 在简介文字后显示配图（动态适应剩余空间） ──
     poi_img = _load_poi_image(panel_poi)
     if poi_img:
         img_w, img_h = poi_img.get_size()
         max_img_w = pw - 60
-        max_img_h = 210
-        scale = min(max_img_w / img_w, max_img_h / img_h, 1.0)
-        d_w = int(img_w * scale)
-        d_h = int(img_h * scale)
-        scaled = pygame.transform.smoothscale(poi_img, (d_w, d_h))
-        img_x = px + (pw - d_w) // 2
-        img_y = text_y + 6
-        screen.surface.blit(scaled, (img_x, img_y))
+        # 剩余空间：内容区域底部 - 文字结束位置 - 边距
+        content_bottom = py + 50 + (ph - 70) - 8
+        avail_h = content_bottom - text_y - 6
+        if avail_h > 20:
+            scale = min(max_img_w / img_w, avail_h / img_h, 1.0)
+            d_w = int(img_w * scale)
+            d_h = int(img_h * scale)
+            scaled = pygame.transform.smoothscale(poi_img, (d_w, d_h))
+            img_x = px + (pw - d_w) // 2
+            img_y = text_y + 6
+            screen.surface.blit(scaled, (img_x, img_y))
 
 def _draw_exercise_content(px, py, pw, ph):
     """绘制习题内容"""
