@@ -241,7 +241,7 @@ def draw_content_panel():
     # 关闭按钮（醒目的 X）
     close_rect = Rect(px + pw - 40, py + 8, 30, 30)
     panel_close_rect = close_rect
-    screen.draw.text("✕", center=close_rect.center, fontname=FONT_NAME, fontsize=22, color=COLOR_CLOSE_BTN)
+    screen.draw.text("X", center=close_rect.center, fontname=FONT_NAME, fontsize=22, color=COLOR_CLOSE_BTN)
 
     if panel_mode == "intro":
         _draw_intro_content(px, py, pw, ph)
