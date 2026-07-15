@@ -203,7 +203,7 @@ def draw_content_panel():
     if not panel_poi:
         return
 
-    pw, ph = 840, 680
+    pw, ph = 630, 510
     px, py = (WIDTH - pw) // 2, (HEIGHT - ph) // 2
     panel_rect = Rect(px, py, pw, ph)
 
@@ -293,7 +293,7 @@ def _draw_intro_content(px, py, pw, ph):
     if poi_img:
         img_w, img_h = poi_img.get_size()
         max_img_w = pw - 60
-        max_img_h = 280
+        max_img_h = 210
         scale = min(max_img_w / img_w, max_img_h / img_h, 1.0)
         img_display_w = int(img_w * scale)
         img_display_h = int(img_h * scale)
@@ -582,7 +582,7 @@ def on_mouse_down(pos, button):
 def _handle_exercise_click(pos):
     """处理习题面板中的选项点击，返回 True 表示已处理"""
     global feedback_msg, feedback_color, exercise_idx, exercise_done
-    pw, ph = 840, 680
+    pw, ph = 630, 510
     px, py = (WIDTH - pw) // 2, (HEIGHT - ph) // 2
     ex = panel_poi["exercises"]
     if not ex:
