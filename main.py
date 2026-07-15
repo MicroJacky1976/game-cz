@@ -10,24 +10,8 @@ import os
 os.environ['SDL_VIDEO_CENTERED'] = '1'
 
 # ── 应用图标 ──────────────────────────────────────────────
-def _make_icon_png():
-    """将军旗图片处理为 64x64 图标并保存"""
-    from PIL import Image as PILImage
-    icon_path = '/tmp/_red_army_icon.png'
-    src = PILImage.open('images/junqi.jpeg')
-    # 中心裁剪为正方形
-    w, h = src.size
-    side = min(w, h)
-    left = (w - side) // 2
-    top = (h - side) // 2
-    src = src.crop((left, top, left + side, top + side))
-    # 缩放到 64x64
-    src = src.resize((64, 64), PILImage.LANCZOS)
-    src.save(icon_path, format='PNG')
-    return icon_path
-
-# 预生成图标文件
-_ICON_PATH = _make_icon_png()
+# 预裁剪的图标文件（64x64 PNG）
+_ICON_PATH = "images/icon.png"
 
 import pgzrun
 import pygame
